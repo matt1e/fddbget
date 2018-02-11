@@ -1,0 +1,47 @@
+<table class="table">
+  <tbody>
+  <% %i[titel marke].each do |elem| %>
+    <tr>
+      <td><%= elem.to_s.split("_").map(&:capitalize).join(" ") %></td>
+      <td><%= result[elem] %></td>
+    </tr>
+  <% end %>
+  <tr>
+    <td>URL</td>
+    <td><a href="<%= result[:url] %>">
+      .../<%= result[:url].split("/")[-2] %>/...
+    </a></td>
+  </tr>
+
+  <% %i[kalorien protein kohlenhydrate davon_zucker fett].each do |elem| %>
+    <tr>
+      <td><%= elem.to_s.split("_").map(&:capitalize).join(" ") %></td>
+      <td><% if result[elem] %><%= result[elem] %> g<% end %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+<form method="post" action="/store">
+  <% result[:options].each_with_index do |opt, i| %>
+    <div class="form-check">
+      <input type="radio" class="form-check-input" id="select_<%= i %>"
+        name="selected_weight" value="<%= opt[:weight] %>">
+      <label for="select_<%= i %>">
+        <%= "#{opt[:name]} (#{opt[:weight]} #{result[:naehrwerte][:unit]})" %>
+      </label>
+    </div>
+  <% end %>
+  <div class="form-check">
+    <input type="radio" class="form-check-input"
+      id="select_<%= result[:options].count %>"
+      name="selected_weight" value="other" checked>
+    <label for="select_<%= result[:options].count %>">Selbsteingabe</label>
+  </div>
+  <div class="form-group">
+    <label for="own_weight">Eigenes Gewicht</label>
+    <input type="text" class="form-control" id="own_weight" name="own_weight"
+      placeholder="Gewicht in <%= result[:naehrwerte][:unit] %>">
+  </div>
+  <button type="submit" class="btn btn-primary">Save</button>
+  <a href="/" class="btn btn-primary">Zurück</a>
+</form>
