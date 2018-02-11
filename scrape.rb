@@ -10,14 +10,19 @@ module Scrape
 
   def search(needle)
     url = SEARCH_URL % {term: CGI.escape(needle)}
-    body = Net::HTTP.get(URI(url))
-    pg = ParserGirl.new(body)
-    food = pg.find("tr").reduce(nil) do |acc, elem|
-      next acc if acc
-      cols = elem.find("td")
-      if cols.first.content.strip == "Beliebt"
-        next cols.to_a[1].find("a").to_h.first[:href]
+    resp = Net::HTTP.get_response(URI(url))
+    if resp.is_a?(Net::HTTPSuccess)
+      pg = ParserGirl.new(resp.body)
+      food = pg.find("tr").reduce(nil) do |acc, elem|
+        next acc if acc
+        cols = elem.find("td")
+        match = ["Sehr beliebt", "Beliebt", "Normal"].any? do |e|
+          cols.first.content.strip == e
+        end
+        next cols.to_a[1].find("a").to_h.first[:href] if match
       end
+    elsif resp.is_a?(Net::HTTPRedirection)
+      food = resp["location"]
     end
     return food ? yield(food) : {status: "error", reason: "no food found"}
   end
@@ -32,8 +37,10 @@ module Scrape
     data = pg.find("div").reduce({}) do |acc, div|
       next acc unless div.to_h[:class] == "standardcontent"
       next acc.merge(
-        title: title(pg),
-        naehrwerte_100g: nutrition(div),
+        titel: title(pg),
+        marke: brand(pg),
+        url: food_url,
+        naehrwerte: nutrition(div),
         options: options(pg)
       ).merge(details(div))
     end
@@ -43,21 +50,29 @@ module Scrape
   def title(container)
     return container.find("h1").reduce(nil) do |acc, h1|
       next acc unless h1.to_h[:id] == "fddb-headline1"
-      next HTMLEntities.new.decode(h1.content)
+      next HTMLEntities.new.decode(decode(h1.content))
+    end
+  end
+
+  def brand(container)
+    return container.find("h2").reduce(nil) do |acc, h1|
+      next acc unless h1.to_h[:id] == "fddb-headline2"
+      next h1.find("a").content.first
     end
   end
 
   def nutrition(container)
     return container.find("h2").reduce(nil) do |acc, h2|
       next acc unless decode(h2.content).include?("Nährwerte")
-      next h2.content.match(/(\d+)/).captures.first.to_i
+      amount, unit = h2.content.match(/(\d+) ([a-z]+)/).captures
+      next {amount: amount.to_i, unit: unit}
     end
   end
 
   def details(container)
     fields = ["Kalorien", "Protein", "Kohlenhydrate", "davon Zucker", "Fett"]
     return fields.reduce({}) do |acc, field|
-      acc[field.downcase.gsub(" ", "_")] = detail(container, field)
+      acc[field.downcase.gsub(" ", "_").to_sym] = detail(container, field)
       next acc
     end
   end
@@ -77,7 +92,8 @@ module Scrape
   def options(container)
     return container.find("a").reduce([]) do |acc, a|
       next acc unless a.to_h[:class] == "servb"
-      name, weight = a.content.match(/^(.*) \(([\d,]+)\s+g\)$/).captures
+      name, weight = a.content.match(/^(.*) \(([\d,]+)\s+\S+\)$/)&.captures
+      next acc if name.nil?
       next acc << {
         name: HTMLEntities.new.decode(name),
         weight: weight.sub(/,/, ".").to_f
@@ -85,7 +101,3 @@ module Scrape
     end
   end
 end
-
-p(Scrape.search("eiernudeln") do |food_url|
-  Scrape.extract(food_url)
-end)
