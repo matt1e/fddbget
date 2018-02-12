@@ -22,6 +22,8 @@
   </tbody>
 </table>
 <form method="post" action="/store">
+  <input type="hidden" name="data"
+    value="<%= Base64.encode64(result.to_json) %>" />
   <% result[:options].each_with_index do |opt, i| %>
     <div class="form-check">
       <input type="radio" class="form-check-input" id="select_<%= i %>"
@@ -40,8 +42,32 @@
   <div class="form-group">
     <label for="own_weight">Eigenes Gewicht</label>
     <input type="text" class="form-control" id="own_weight" name="own_weight"
-      placeholder="Gewicht in <%= result[:naehrwerte][:unit] %>">
+      placeholder="Menge in <%= result[:naehrwerte][:unit] %>">
+  </div>
+  <div class="form-group">
+    <label for="category">Gruppenzuordnung</label>
+    <select class="form-control" id="category" name="category">
+      <option>1</option>
+      <option>2</option>
+      <option>3</option>
+      <option>4</option>
+      <option>5</option>
+      <option>6</option>
+    </select>
+  </div>
+  <div class="form-group date" data-provide="datepicker"
+    data-date-today-highlight="true"
+    data-date-today-btn="true"
+    data-date-language="de">
+    <label for="datepick">Referenztag (optional)</label>
+    <input type="text" class="form-control" id="datepick" name="create_at">
+    <div class="input-group-addon">
+      <span class="glyphicon glyphicon-th"></span>
+    </div>
   </div>
   <button type="submit" class="btn btn-primary">Save</button>
   <a href="/" class="btn btn-primary">Zurück</a>
 </form>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/locales/bootstrap-datepicker.de.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.standalone.min.css" />

@@ -1,8 +1,39 @@
-<form method="post" action="/search">
-  <div class="form-group">
-    <label for="search_term">Futtersuche</label>
-    <input type="text" class="form-control" id="search_term"
-      name="search_term" placeholder="Essensbeschreibung eingeben">
+<div class="row">
+  <div class="col-xs col-sm">
+    <form method="post" action="/search">
+      <div class="form-group">
+        <label for="search_term">Futtersuche</label>
+        <input type="text" class="form-control" id="search_term"
+          name="search_term" placeholder="Essensbeschreibung eingeben">
+      </div>
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
   </div>
-  <button type="submit" class="btn btn-primary">Search</button>
-</form>
+</div>
+
+<div class="row" style="margin-top: 20px">
+  <div class="col-xs col-sm">
+    <h3>Statistiken</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <% aggr.first.keys.each do |key| %>
+            <th scope="col"><%= key %></th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% aggr.each do |a| %>
+          <tr>
+            <% a.values.each do |val| %>
+              <% if val.is_a?(Numeric)
+                  val = "%.2f" % [val]
+                end %>
+              <td><%= val %></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
