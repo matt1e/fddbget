@@ -68,6 +68,24 @@ class Fddb < Grape::API
       select_append { sum(:fett).as("Fett") }.
       where { created_at > Date.today - 10 }.
       order(:created_at).reverse
+    categories = {
+      "Kalorien" => 0.0,
+      "Gruppe 1 Getreide" => 0.0,
+      "Gruppe 2 Milch" => 0.0,
+      "Gruppe 3 Fleisch" => 0.0,
+      "Gruppe 4 Gemüse" => 0.0,
+      "Gruppe 5 Obst" => 0.0,
+      "Gruppe 6 Fett" => 0.0,
+      "Gruppe 7 Extras" => 0.0
+    }
+    aggr = aggr.reduce({}) do |acc, row|
+      acc[row[:created_at]] ||= categories.dup
+      acc[row[:created_at]]["Kalorien"] += row[:Kalorien]
+      acc[row[:created_at]][row[:category]] = row[:Kohlenhydrate] / 25.0 +
+        row["Davon Zucker".to_sym] / 25.0 + row[:Fett] / 10.0 +
+        row[:Protein] / 15.0
+      next acc
+    end
     Renderer.run :index, binding
   end
 
@@ -134,6 +152,16 @@ class Fddb < Grape::API
         args = create_at.split(".").reverse.map(&:to_i)
         create_at = Date.new(*args)
       end
+      insert = {
+        created_at: create_at,
+        category: declared(params)[:category],
+        title: data[:titel],
+        brand: data[:marke],
+        url: data[:url],
+        nutrition_amount: data[:naehrwerte][:amount],
+        nutrition_taken: weight,
+        nutrition_unit: data[:naehrwerte][:unit]
+      }
       calc = %i[
         kalorien
         protein
@@ -144,16 +172,27 @@ class Fddb < Grape::API
         acc[f] = data[f].to_f / data[:naehrwerte][:amount].to_f * weight
         next acc
       end
-      Db.instance[:food].insert({
-        created_at: create_at,
-        category: declared(params)[:category],
-        title: data[:titel],
-        brand: data[:marke],
-        url: data[:url],
-        nutrition_amount: data[:naehrwerte][:amount],
-        nutrition_taken: weight,
-        nutrition_unit: data[:naehrwerte][:unit]
-      }.merge(calc))
+      args =
+        if insert[:category] == "Aufsplitten"
+          fields = {
+            protein: "Gruppe 3 Fleisch",
+            kohlenhydrate: "Gruppe 1 Getreide",
+            davon_zucker: "Gruppe 7 Extras",
+            fett: "Gruppe 6 Fett"
+          }
+          sum_weight = fields.keys.reduce(0.0) { |a, f| a + data[f].to_f }
+          cal_split = fields.keys.reduce({}) do |acc, f|
+            acc[f] = data[:kalorien].to_f * data[f].to_f / sum_weight
+            next acc
+          end
+          fields.keys.each { |f| insert[f] = 0.0 }
+          fields.map do |f, c|
+            insert.dup.merge(category: c, kalorien: cal_split[f], f => calc[f])
+          end
+        else
+          [insert.merge(calc)]
+        end
+      Db.instance[:food].multi_insert(args)
       status 302
       header "location", "/"
     end

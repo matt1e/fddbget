@@ -18,25 +18,25 @@
     <table class="table">
       <thead>
         <tr>
-          <% aggr.first.keys.each do |key| %>
-            <th scope="col"><%= key %></th>
-          <% end %>
+          <th scope="col">Datum</th>
+          <th scope="col">Kalorien</th>
+          <th scope="col">Gr. 1</th>
+          <th scope="col">Gr. 2</th>
+          <th scope="col">Gr. 3</th>
+          <th scope="col">Gr. 4</th>
+          <th scope="col">Gr. 5</th>
+          <th scope="col">Gr. 6</th>
+          <th scope="col">Gr. 7</th>
         </tr>
       </thead>
       <tbody>
-        <% aggr.each do |a| %>
+        <% aggr.each do |date, h| %>
           <tr>
-            <% a.values.each do |val| %>
-              <% if val.to_s =~ /\d{4}-\d{2}-\d{2}/ %>
-                <td>
-                  <a href="/detail?created_at=<%= val %>"><%= val %></a>
-                </td>
-              <% else %>
-                <% if val.is_a?(Numeric)
-                     val = "%.2f" % [val]
-                   end %>
-                <td><%= val %></td>
-              <% end %>
+            <td>
+              <a href="/detail?created_at=<%= date %>"><%= date %></a>
+            </td>
+            <% h.each do |_c, bst| %>
+              <td><%= "%.1f" % [bst] %></td>
             <% end %>
           </tr>
         <% end %>
