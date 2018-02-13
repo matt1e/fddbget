@@ -11,6 +11,7 @@
   </div>
 </div>
 
+<% if aggr.first %>
 <div class="row" style="margin-top: 20px">
   <div class="col-xs col-sm">
     <h3>Statistiken</h3>
@@ -26,10 +27,16 @@
         <% aggr.each do |a| %>
           <tr>
             <% a.values.each do |val| %>
-              <% if val.is_a?(Numeric)
-                  val = "%.2f" % [val]
-                end %>
-              <td><%= val %></td>
+              <% if val.to_s =~ /\d{4}-\d{2}-\d{2}/ %>
+                <td>
+                  <a href="/detail?created_at=<%= val %>"><%= val %></a>
+                </td>
+              <% else %>
+                <% if val.is_a?(Numeric)
+                     val = "%.2f" % [val]
+                   end %>
+                <td><%= val %></td>
+              <% end %>
             <% end %>
           </tr>
         <% end %>
@@ -37,3 +44,4 @@
     </table>
   </div>
 </div>
+<% end %>

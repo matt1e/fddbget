@@ -66,8 +66,27 @@ class Fddb < Grape::API
       select_append { sum(:kohlenhydrate).as("Kohlenhydrate") }.
       select_append { sum(:davon_zucker).as("Davon Zucker") }.
       select_append { sum(:fett).as("Fett") }.
+      where { created_at > Date.today - 10 }.
       order(:created_at).reverse
     Renderer.run :index, binding
+  end
+
+  params do
+    requires :created_at, type: String
+  end
+  get "/detail" do
+    if declared(params)[:created_at] !~ /^\d{4}-\d{2}-\d{2}$/
+      error = "Datum muss im Format yyyy-mm-dd sein"
+      status 400
+      Renderer.run :error, binding
+    else
+      args = declared(params)[:created_at].split("-").map(&:to_i)
+      created_at = Date.new(*args)
+      aggr = Db.instance[:food].
+        where(created_at: created_at).
+        order(:created_at).to_a
+      Renderer.run :detail, binding
+    end
   end
 
   params do
