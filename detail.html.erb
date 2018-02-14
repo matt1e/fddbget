@@ -1,0 +1,24 @@
+<h3>Statistiken am <%= declared(params)[:created_at] %></h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Titel</th>
+      <th scope="col">Marke</th>
+      <th scope="col">URL</th>
+      <th scope="col">Kategorie</th>
+      <th scope="col">Menge</th>
+      <th scope="col">Kalorien</th>
+      <th scope="col">Protein</th>
+      <th scope="col">Kohlenhydrate</th>
+      <th scope="col">Davon Zucker</th>
+      <th scope="col">Fett</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% aggr.each do |a| %>
+      <tr>
+          <td></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
