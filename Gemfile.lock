@@ -33,6 +33,7 @@ GEM
     mustermann-grape (1.0.0)
       mustermann (~> 1.0.0)
     parser_girl (1.2.1)
+    puma (3.11.2)
     rack (2.0.4)
     rack-accept (0.4.5)
       rack (>= 0.4)
@@ -54,6 +55,7 @@ DEPENDENCIES
   grape!
   htmlentities!
   parser_girl!
+  puma!
   sequel!
   sqlite3!
 

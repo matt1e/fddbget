@@ -4,4 +4,5 @@ source 'https://rubygems.org' do
   gem "htmlentities"
   gem "sqlite3"
   gem "sequel"
+  gem "puma"
 end

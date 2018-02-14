@@ -1,3 +1,4 @@
+require "erb"
 require "grape"
 require "sqlite3"
 require "sequel"
@@ -59,6 +60,9 @@ class Fddb < Grape::API
   default_format :txt
   content_type :html, "text/html"
 
+  params do
+    optional :all, type: String
+  end
   get "/" do
     aggr = Db.instance[:food].group_and_count(:created_at, :category).
       select_append { sum(:kalorien).as("Kalorien") }.
@@ -66,8 +70,10 @@ class Fddb < Grape::API
       select_append { sum(:kohlenhydrate).as("Kohlenhydrate") }.
       select_append { sum(:davon_zucker).as("Davon Zucker") }.
       select_append { sum(:fett).as("Fett") }.
-      where { created_at > Date.today - 10 }.
       order(:created_at).reverse
+    unless declared(params)[:all] == "true"
+      aggr = aggr.where { created_at > Date.today - 10 }
+    end
     categories = {
       "Kalorien" => 0.0,
       "Gruppe 1 Getreide" => 0.0,
@@ -197,6 +203,10 @@ class Fddb < Grape::API
       header "location", "/"
     end
   end
+end
+
+use Rack::Auth::Basic, ENV["BASIC_USER"] do |username, password|
+    Rack::Utils.secure_compare(ENV["BASIC_PASS"], password)
 end
 
 run Fddb
