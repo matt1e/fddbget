@@ -57,7 +57,7 @@ module Scrape
   def brand(container)
     return container.find("h2").reduce(nil) do |acc, h1|
       next acc unless h1.to_h[:id] == "fddb-headline2"
-      next h1.find("a").content.first
+      next HTMLEntities.new.decode(decode(h1.find("a").content.first))
     end
   end
 
