@@ -9,7 +9,7 @@ module Scrape
   SEARCH_URL = "http://fddb.info/db/de/suche/?udd=0&cat=site-de&search=%{term}"
 
   def search(needle)
-    url = SEARCH_URL % {term: CGI.escape(needle)}
+    url = SEARCH_URL % {term: CGI.escape(needle.encode("iso-8859-1"))}
     resp = Net::HTTP.get_response(URI(url))
     if resp.is_a?(Net::HTTPSuccess)
       pg = ParserGirl.new(resp.body)
