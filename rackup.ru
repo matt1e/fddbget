@@ -186,9 +186,9 @@ class Fddb < Grape::API
             davon_zucker: "Gruppe 7 Extras",
             fett: "Gruppe 6 Fett"
           }
-          sum_weight = fields.keys.reduce(0.0) { |a, f| a + data[f].to_f }
+          sum_weight = fields.keys.reduce(0.0) { |a, f| a + calc[f].to_f }
           cal_split = fields.keys.reduce({}) do |acc, f|
-            acc[f] = data[:kalorien].to_f * data[f].to_f / sum_weight
+            acc[f] = calc[:kalorien].to_f * calc[f].to_f / sum_weight
             next acc
           end
           fields.keys.each { |f| insert[f] = 0.0 }
