@@ -205,8 +205,10 @@ class Fddb < Grape::API
   end
 end
 
-use Rack::Auth::Basic, ENV["BASIC_USER"] do |username, password|
-    Rack::Utils.secure_compare(ENV["BASIC_PASS"], password)
+if ENV["BASIC_USER"]
+  use Rack::Auth::Basic, ENV["BASIC_USER"] do |username, password|
+      Rack::Utils.secure_compare(ENV["BASIC_PASS"], password)
+  end
 end
 
 run Fddb

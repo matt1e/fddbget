@@ -9,22 +9,46 @@ module Scrape
   SEARCH_URL = "http://fddb.info/db/de/suche/?udd=0&cat=site-de&search=%{term}"
 
   def search(needle)
+    needle, args = split_args(needle)
+    needle = needle.join(" ")
     url = SEARCH_URL % {term: CGI.escape(needle.encode("iso-8859-1"))}
     resp = Net::HTTP.get_response(URI(url))
     if resp.is_a?(Net::HTTPSuccess)
       pg = ParserGirl.new(resp.body)
-      food = pg.find("tr").reduce(nil) do |acc, elem|
-        next acc if acc
+      table = pg.find("table").detect do |elem|
         cols = elem.find("td")
-        match = ["Sehr beliebt", "Beliebt", "Normal"].any? do |e|
-          cols.first.content.strip == e
+        next ["Sehr beliebt", "Beliebt", "Normal"].any? do |e|
+          cols.content.any? { |c| c.strip == e }
         end
-        next cols.to_a[1].find("a").to_h.first[:href] if match
       end
+      food = table.find("tr").reduce([]) do |acc, elem|
+        cols = elem.find("td")
+        if cols.count > 1
+          acc << cols.to_a[1].find("a")&.to_h&.first&.[](:href)
+        end
+        next acc
+      end.compact
+      food =
+        if args.key?(:num)
+          food[[args[:num], food.count].min - 1]
+        else
+          food[0]
+        end
     elsif resp.is_a?(Net::HTTPRedirection)
       food = resp["location"]
     end
     return food ? yield(food) : {status: "error", reason: "no food found"}
+  end
+
+  def split_args(needle)
+    return needle.split(" ").reduce([[], {}]) do |(elems, args), str|
+      if str =~ /^num:(\d+)$/
+        args[:num] = $1.to_i
+      else
+        elems << str
+      end
+      next elems, args
+    end
   end
 
   def decode(str)

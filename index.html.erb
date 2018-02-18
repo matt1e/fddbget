@@ -3,10 +3,17 @@
     <form method="post" action="/search">
       <div class="form-group">
         <label for="search_term">Futtersuche</label>
-        <input type="text" class="form-control" id="search_term"
-          name="search_term" placeholder="Essensbeschreibung eingeben">
+        <input type="text" class="form-control"
+          id="search_term" name="search_term"
+          placeholder="Essensbeschreibung eingeben. Optionen siehe unten">
       </div>
       <button type="submit" class="btn btn-primary">Search</button>
+      <h5 style="margin-top: 20px;">Optionen</h5>
+      <ul>
+        <li>
+          num: Position in der fddb Suche (z.B. num:4 liefert den 4ten Link)
+        </li>
+      </ul>
     </form>
   </div>
 </div>
@@ -45,4 +52,18 @@
   </div>
 </div>
 <a href="?all=true" class="btn btn-primary">Alle anzeigen</a>
+<h5 style="margin-top: 20px">Legende</h5>
+<ul>
+  <li>Gruppe 1 Getreideprodukte, Kartoffeln, Reis, Brot</li>
+  <li>Gruppe 2 Milch, Quark, Joghurt, Käse, Molke, saure Sahne, Sojamilch,
+    Sojaprodukte</li>
+  <li>Gruppe 3 Fleisch, Fisch, Eier, Hülsenfrüchte, Wurst, Tofu</li>
+  <li>Gruppe 4 Gemüse</li>
+  <li>Gruppe 5 Obst, Obstsaft, getrocknetes Obst</li>
+  <li>Gruppe 6 Fett, Öl, Margarine/Butter, Salatdressing, Schlagsahne,
+    Creme fraiche, Schmand, Mayonaise, Nüsse, Oliven, Avocado</li>
+  <li>Gruppe 7 Extras und Alkohol, Marmelade, Honig, Nuss-Nougat-Creme,
+    Süßigkeiten, Kuchen, Salzgebäck, Braten- und Sahnesoße, Tomatenketchup,
+    Limonade</li>
+</ul>
 <% end %>
