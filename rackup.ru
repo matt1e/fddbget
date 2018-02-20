@@ -203,6 +203,17 @@ class Fddb < Grape::API
       header "location", "/"
     end
   end
+
+  params do
+    requires :id, type: Integer
+  end
+  post "food/:id/delete" do
+    food = Db.instance[:food].where(id: declared(params)[:id])
+    created_at = food.first[:created_at]
+    food.delete
+    status 302
+    header "location", "/detail?created_at=#{created_at}"
+  end
 end
 
 if ENV["BASIC_USER"]

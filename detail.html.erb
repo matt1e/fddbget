@@ -12,6 +12,7 @@
       <th scope="col">Kohlenhydrate</th>
       <th scope="col">Davon Zucker</th>
       <th scope="col">Fett</th>
+      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
@@ -30,6 +31,13 @@
         <% %i[kalorien protein kohlenhydrate davon_zucker fett].each do |s| %>
           <td><%= "%.1f" % [a[s]] %></td>
         <% end %>
+        <td>
+          <form method="post" action="/food/<%= a[:id] %>/delete">
+            <button type="submit" class="btn btn-default" aria-label="Left Align">
+              <i class="fa fa-trash-o"></i>
+            </button>
+          </form>
+        </td>
       </tr>
     <% end %>
   </tbody>
