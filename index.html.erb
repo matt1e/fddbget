@@ -100,7 +100,7 @@ var myChart = new Chart(ctx, {
         <% categories.keys.each_with_index do |cat, i| %>
         {
           label: '<%= cat %>',
-          data: <%= aggr.map { |_, d| d.values[i] }.to_json %>,
+          data: <%= aggr.reverse.map { |_, d| d.values[i] }.to_json %>,
             backgroundColor: [bColor[<%= i %>]],
             borderColor: [lColor[<%= i %>]],
             borderWidth: 1
