@@ -95,7 +95,7 @@ var myChart = new Chart(ctx, {
     type: 'line',
     responsive: true,
     data: {
-      labels: <%= aggr.map(&:first).to_json %>,
+      labels: <%= aggr.keys.reverse.to_json %>,
       datasets: [
         <% categories.keys.each_with_index do |cat, i| %>
         {
