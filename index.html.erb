@@ -27,13 +27,13 @@
         <tr>
           <th scope="col">Datum</th>
           <th scope="col">Kalorien</th>
-          <th scope="col">Gr. 1</th>
-          <th scope="col">Gr. 2</th>
-          <th scope="col">Gr. 3</th>
-          <th scope="col">Gr. 4</th>
-          <th scope="col">Gr. 5</th>
-          <th scope="col">Gr. 6</th>
-          <th scope="col">Gr. 7</th>
+          <th scope="col">Gr. 1 (5)</th>
+          <th scope="col">Gr. 2 (3)</th>
+          <th scope="col">Gr. 3 (2,5)</th>
+          <th scope="col">Gr. 4 (3)</th>
+          <th scope="col">Gr. 5 (2)</th>
+          <th scope="col">Gr. 6 (3)</th>
+          <th scope="col">Gr. 7 (1)</th>
         </tr>
       </thead>
       <tbody>
@@ -66,4 +66,57 @@
     Süßigkeiten, Kuchen, Salzgebäck, Braten- und Sahnesoße, Tomatenketchup,
     Limonade</li>
 </ul>
+<div class="chart-container col-xs col-sm">
+  <canvas id="chart"></canvas>
+</div>
+<script>
+var ctx = document.getElementById("chart").getContext('2d');
+var bColor = [
+  'rgba(255, 99, 132, 0.2)',
+  'rgba(54, 162, 235, 0.2)',
+  'rgba(255, 206, 86, 0.2)',
+  'rgba(75, 192, 192, 0.2)',
+  'rgba(153, 102, 255, 0.2)',
+  'rgba(255, 159, 64, 0.2)',
+  'rgba(25, 100, 230, 0.2)',
+  'rgba(153, 230, 100, 0.2)',
+];
+var lColor = [
+  'rgba(255, 99, 132, 1)',
+  'rgba(54, 162, 235, 1)',
+  'rgba(255, 206, 86, 1)',
+  'rgba(75, 192, 192, 1)',
+  'rgba(153, 102, 255, 1)',
+  'rgba(255, 159, 64, 1)',
+  'rgba(25, 100, 230, 1)',
+  'rgba(153, 230, 100, 1)',
+];
+var myChart = new Chart(ctx, {
+    type: 'line',
+    responsive: true,
+    data: {
+      labels: <%= aggr.map(&:first).to_json %>,
+      datasets: [
+        <% categories.keys.each_with_index do |cat, i| %>
+        {
+          label: '<%= cat %>',
+          data: <%= aggr.map { |_, d| d.values[i] }.to_json %>,
+            backgroundColor: [bColor[<%= i %>]],
+            borderColor: [lColor[<%= i %>]],
+            borderWidth: 1
+        },
+        <% end %>
+        ]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+});
+</script>
 <% end %>
