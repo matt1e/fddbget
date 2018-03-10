@@ -1,26 +1,37 @@
-<table class="table">
-  <tbody>
-  <% %i[titel marke].each do |elem| %>
-    <tr>
-      <td><%= elem.to_s.split("_").map(&:capitalize).join(" ") %></td>
-      <td><%= result[elem] %></td>
-    </tr>
-  <% end %>
-  <tr>
-    <td>URL</td>
-    <td><a href="<%= result[:url] %>">
-      .../<%= result[:url].split("/")[-2] %>/...
-    </a></td>
-  </tr>
+<div class="row">
+  <div class="col-xs-8 col-sm-8">
+    <table class="table">
+      <tbody>
+      <% %i[titel marke].each do |elem| %>
+        <tr>
+          <td><%= elem.to_s.split("_").map(&:capitalize).join(" ") %></td>
+          <td><%= result[elem] %></td>
+        </tr>
+      <% end %>
+      <tr>
+        <td>URL</td>
+        <td><a href="<%= result[:url] %>">
+          .../<%= result[:url].split("/")[-2] %>/...
+        </a></td>
+      </tr>
 
-  <% %i[kalorien protein kohlenhydrate davon_zucker fett].each do |elem| %>
-    <tr>
-      <td><%= elem.to_s.split("_").map(&:capitalize).join(" ") %></td>
-      <td><% if result[elem] %><%= result[elem] %> g<% end %></td>
-    </tr>
-  <% end %>
-  </tbody>
-</table>
+      <%
+        %i[kalorien protein kohlenhydrate davon_zucker fett].each do |elem|
+      %>
+        <tr>
+          <td><%= elem.to_s.split("_").map(&:capitalize).join(" ") %></td>
+          <td><% if result[elem] %><%= result[elem] %> g<% end %></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-xs-4 col-sm-4">
+    <% if result[:image] %>
+      <img src="<%= result[:image] %>" />
+    <% end %>
+  </div>
+</div>
 <form method="post" action="/store">
   <input type="hidden" name="data"
     value="<%= Base64.encode64(result.to_json) %>" />

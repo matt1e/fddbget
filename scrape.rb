@@ -63,6 +63,7 @@ module Scrape
       next acc.merge(
         titel: title(pg),
         marke: brand(pg),
+        image: image(pg),
         url: food_url,
         naehrwerte: nutrition(div),
         options: options(pg)
@@ -82,6 +83,13 @@ module Scrape
     return container.find("h2").reduce(nil) do |acc, h1|
       next acc unless h1.to_h[:id] == "fddb-headline2"
       next HTMLEntities.new.decode(decode(h1.find("a").content.first))
+    end
+  end
+
+  def image(container)
+    return container.find("img").reduce(nil) do |acc, img|
+      next acc if acc || !img.to_h[:class]&.include?("imagesimpleborder")
+      next img.to_h[:src]
     end
   end
 

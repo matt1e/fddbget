@@ -140,8 +140,13 @@ class Fddb < Grape::API
       error = "Gewichteingabe muss eine Zahl oder Kommazahl sein"
       status 400
       Renderer.run :error, binding
+    elsif declared(params)[:own_weight].length > 0 &&
+          declared(params)[:selected_weight] != "other"
+      error = "Entscheide dich. Eigenes Gewicht ODER Voreinstellung!"
+      status 400
+      Renderer.run :error, binding
     elsif (declared(params)[:create_at]&.length || 0) > 0 &&
-        declared(params)[:create_at] !~ /^\d{2}\.\d{2}\.\d{4}$/
+          declared(params)[:create_at] !~ /^\d{2}\.\d{2}\.\d{4}$/
       error = "Datum muss im Format dd.mm.yyyy sein"
       status 400
       Renderer.run :error, binding
