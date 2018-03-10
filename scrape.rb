@@ -127,7 +127,7 @@ module Scrape
       name, weight = a.content.match(/^(.*) \(([\d,]+)\s+\S+\)$/)&.captures
       next acc if name.nil?
       next acc << {
-        name: HTMLEntities.new.decode(name),
+        name: HTMLEntities.new.decode(decode(name)),
         weight: weight.sub(/,/, ".").to_f
       }
     end
