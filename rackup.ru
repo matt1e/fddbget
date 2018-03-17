@@ -227,4 +227,7 @@ if ENV["BASIC_USER"]
   end
 end
 
+use Rack::Static, root: "public",
+  urls: Dir["public/*"].map { |f| "/#{f.sub(/^public\//, "")}" }
+
 run Fddb
