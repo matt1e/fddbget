@@ -220,6 +220,9 @@ class Fddb < Grape::API
       if Db.instance[:cache].first(title: data[:titel]).nil?
         Db.instance[:cache].insert(title: data[:titel],
           data: declared(params)[:data])
+      else
+        Db.instance[:cache].where(title: data[:titel]).
+          update(data: declared(params)[:data])
       end
       status 302
       header "location", "/"
