@@ -52,6 +52,11 @@ module Db
       Numeric :davon_zucker
       Numeric :fett
     end
+    db.create_table :cache do
+      primary_key :id
+      String :title, text: true
+      String :data, text: true
+    end
     return db
   end
 end
@@ -92,6 +97,7 @@ class Fddb < Grape::API
         row[:Protein] / 15.0
       next acc
     end
+    cached_names = Db.instance[:cache].select(:title).map { |r| r[:title] }
     Renderer.run :index, binding
   end
 
@@ -117,8 +123,15 @@ class Fddb < Grape::API
     requires :search_term, type: String
   end
   post "/search" do
-    result = Scrape.search(declared(params)[:search_term]) do |food_url|
-      Scrape.extract(food_url)
+    if declared(params)[:search_term].include?(" -cached")
+      result = JSON.parse(Base64.decode64(Db.instance[:cache].
+        first(
+          title: declared(params)[:search_term].sub(/ -cached/, "")
+        )[:data]), symbolize_names: true)
+    else
+      result = Scrape.search(declared(params)[:search_term]) do |food_url|
+        Scrape.extract(food_url)
+      end
     end
     if result.empty?
       Renderer.run :not_found, binding
@@ -204,6 +217,10 @@ class Fddb < Grape::API
           [insert.merge(calc)]
         end
       Db.instance[:food].multi_insert(args)
+      if Db.instance[:cache].first(title: data[:titel]).nil?
+        Db.instance[:cache].insert(title: data[:titel],
+          data: declared(params)[:data])
+      end
       status 302
       header "location", "/"
     end

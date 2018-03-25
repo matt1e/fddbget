@@ -3,8 +3,8 @@
     <form method="post" action="/search">
       <div class="form-group">
         <label for="search_term">Futtersuche</label>
-        <input type="text" class="form-control"
-          id="search_term" name="search_term"
+        <input type="text" class="form-control awesomeplete"
+          id="search_term" name="search_term" list="cached_names"
           placeholder="Essensbeschreibung eingeben. Optionen siehe unten">
       </div>
       <button type="submit" class="btn btn-primary">Search</button>
@@ -14,6 +14,11 @@
           num: Position in der fddb Suche (z.B. num:4 liefert den 4ten Link)
         </li>
       </ul>
+      <datalist id="cached_names">
+        <% cached_names.each do |c| %>
+          <option><%= c %> -cached</option>
+        <% end %>
+      </datalist>
     </form>
   </div>
 </div>
