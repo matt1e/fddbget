@@ -6,7 +6,7 @@ require "htmlentities"
 module Scrape
   extend self
 
-  SEARCH_URL = "http://fddb.info/db/de/suche/?udd=0&cat=site-de&search=%{term}"
+  SEARCH_URL = "https://fddb.info/db/de/suche/?udd=0&cat=site-de&search=%{term}"
 
   def search(needle)
     needle, args = split_args(needle)
@@ -80,9 +80,9 @@ module Scrape
   end
 
   def brand(container)
-    return container.find("h2").reduce(nil) do |acc, h1|
-      next acc unless h1.to_h[:id] == "fddb-headline2"
-      next HTMLEntities.new.decode(decode(h1.find("a").content.first))
+    return container.find("h2").reduce(nil) do |acc, h2|
+      next acc unless h2.to_h[:id] == "fddb-headline2"
+      next HTMLEntities.new.decode(decode(h2.find("a").content.first))
     end
   end
 
